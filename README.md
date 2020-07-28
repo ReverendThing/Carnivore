@@ -1,2 +1,2 @@
 # Carnivore
-Microsoft External Attack Tool
+Microsoft External Assessment Tool
