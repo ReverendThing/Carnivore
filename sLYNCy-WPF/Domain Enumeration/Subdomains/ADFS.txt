@@ -1,0 +1,15 @@
+﻿fs
+federated
+adfs
+portal
+gateway
+federation
+federate
+adfsproxy
+adfs1
+adfs2
+adfs01
+adfs02
+adfstest
+fs1
+fs2

@@ -1,0 +1,17 @@
+﻿lyncdiscover
+dialin
+meet
+lync
+lyncweb
+sip
+skype
+sfbweb
+scheduler
+lyncext
+lyncdiscoverinternal
+access
+lyncaccess01
+lyncaccess
+lync10
+wac
+_sipinternaltls

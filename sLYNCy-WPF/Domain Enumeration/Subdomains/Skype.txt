@@ -1,0 +1,15 @@
+﻿dialin
+meet
+lyncdiscover
+scheduler
+access
+lync
+lyncext
+lyncaccess01
+lyncaccess
+lync10
+lyncweb
+sip
+lyncdiscoverinternal
+wac
+_sipinternaltls

@@ -1,0 +1,11 @@
+﻿/WebTicket/WebTicketService.svc
+/abs/
+/CertProv
+/RgsClients
+/WebTicket/
+/Autodiscover
+/WebTicket/WebTicketService.svc/Auth
+/GroupExpansion
+/RequestHandlerExt
+/mcx
+/cscp

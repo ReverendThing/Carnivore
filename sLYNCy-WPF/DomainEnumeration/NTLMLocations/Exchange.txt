@@ -1,0 +1,6 @@
+﻿/Autodiscover
+/ews
+/autodiscover/autodiscover.xml
+/rpc
+/oab
+/mapi
