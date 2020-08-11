@@ -303,13 +303,19 @@ namespace sLYNCy_WPF
                             string[] caValues = headers.GetValues("Set-Cookie");
                             if (caValues != null)
                             {
-                                UI.ThreadSafeAppendLog("[1][!] Valid credentials found for Exchange: " + username);
-                                return new CredentialsRecord() { Username = username, UserRaw = StripUser(username), Password = password, SipEnabled = "", Service = MicrosoftService.Exchange };
-                            }
-                            else if (responseString.Contains("expiredpassword.aspx"))
-                            {
-                                UI.ThreadSafeAppendLog("[1][!] Valid credentials found for Exchange - Password has expired: " + username);
-                                return new CredentialsRecord() { Username = username, UserRaw = StripUser(username), Password = password, SipEnabled = "", Service = MicrosoftService.Exchange, PasswordExpired = "Y" };
+                                foreach (string value in caValues)
+                                {
+                                    if (value.Contains("cadata"))
+                                    {
+                                        UI.ThreadSafeAppendLog("[1][!] Valid credentials found for Exchange: " + username);
+                                        return new CredentialsRecord() { Username = username, UserRaw = StripUser(username), Password = password, SipEnabled = "", Service = MicrosoftService.Exchange };
+                                    }
+                                    else if (value.Contains("expiredpassword.aspx"))
+                                    {
+                                        UI.ThreadSafeAppendLog("[1][!] Valid credentials found for Exchange - Password has expired: " + username);
+                                        return new CredentialsRecord() { Username = username, UserRaw = StripUser(username), Password = password, SipEnabled = "", Service = MicrosoftService.Exchange, PasswordExpired = "Y" };
+                                    }
+                                }
                             }
                             break;
                         case MicrosoftService.ADFS:

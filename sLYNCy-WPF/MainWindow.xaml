@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:sLYNCy_WPF"
         mc:Ignorable="d"
-        Title="Carnivore - Microsoft External Assessment Tool - v1.0.0 by Chris Nevin @NCCGROUP" Height="856.911" Width="1345.266" Background="{x:Null}" Visibility="Visible" WindowStyle="ThreeDBorderWindow">
+        Title="Carnivore - Microsoft External Assessment Tool - v1.0.1 by Chris Nevin @NCCGROUP" Height="856.911" Width="1345.266" Background="{x:Null}" Visibility="Visible" WindowStyle="ThreeDBorderWindow">
 
     <Window.Resources>
         <!--
