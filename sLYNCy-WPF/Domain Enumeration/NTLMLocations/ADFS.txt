@@ -1,6 +1,0 @@
-﻿/adfs/services/trust/2005/windowstransport
-/adfs/services/trust/13/windowstransport
-/adfs/services/trust/2005/windowsmixed
-/adfs/services/trust/2005/windows
-/adfs/services/trust/13/windowsmixed
-/adfs/services/trust/13/windows
