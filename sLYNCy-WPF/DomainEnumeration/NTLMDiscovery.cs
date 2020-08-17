@@ -225,6 +225,14 @@ namespace sLYNCy_WPF
                                 {
                                     ParseNTLM(NTLMString.Value, host, host.SprayURL.Url);
                                 }
+                                else
+                                {
+                                    Match NTLMString2 = RegexClass.ReturnMatch(Regexs.NTLMResponse, ntlmResponse);
+                                    if (NTLMString2.Success)
+                                    {
+                                        ParseNTLM(NTLMString2.Value, host, host.SprayURL.Url);
+                                    }
+                                }
                             }
                             else
                             {
@@ -276,6 +284,14 @@ namespace sLYNCy_WPF
                                     if (NTLMString.Success)
                                     {
                                         ParseNTLM(NTLMString.Value, host, url);
+                                    }
+                                    else
+                                    {
+                                        Match NTLMString2 = RegexClass.ReturnMatch(Regexs.NTLMResponse, ntlmResponse);
+                                        if (NTLMString2.Success)
+                                        {
+                                            ParseNTLM(NTLMString2.Value, host, host.SprayURL.Url);
+                                        }
                                     }
                                 }
                                 else
