@@ -657,8 +657,15 @@ namespace sLYNCy_WPF
                                 {
                                     if (value.Contains("cadata"))
                                     {
-                                        UI.ThreadSafeAppendLog("[1][!] Valid credentials found for Exchange: " + username);
-                                        return new CredentialsRecord() { Username = username, UserRaw = StripUser(username), Password = password, SipEnabled = "", Service = MicrosoftService.Exchange };
+                                        if (value.Contains("cadata=;"))
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            UI.ThreadSafeAppendLog("[1][!] Valid credentials found for Exchange: " + username);
+                                            return new CredentialsRecord() { Username = username, UserRaw = StripUser(username), Password = password, SipEnabled = "", Service = MicrosoftService.Exchange };
+                                        }
                                     }
                                     else if (value.Contains("expiredpassword.aspx"))
                                     {

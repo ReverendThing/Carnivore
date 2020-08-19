@@ -135,7 +135,7 @@ namespace sLYNCy_WPF
         public static void AddModern(string line, Hostnames host, ref List<string> preparedUsernames, MainWindow UI, SendingWindow sender, ref Hostnames ntlmHost, ref Hostnames oAuthHost, bool onlyModern)
         {
             //Add this host's oauth domain if possible
-            if (host.OAuthDomain != null)
+            if (host.OAuthDomain != null && host.OAuthDomain != "")
             {
                 if (DoWeAdd(line, UI, sender))
                 {
@@ -143,7 +143,7 @@ namespace sLYNCy_WPF
                 }
 
             }
-            else if (host.NTLMDomain != null && onlyModern == false)
+            else if (host.NTLMDomain != null && host.NTLMDomain != "" && onlyModern == false)
             {
                 //Add this hosts legacy format if not
                 if (DoWeAdd(line, UI, sender))
@@ -168,12 +168,20 @@ namespace sLYNCy_WPF
                 }
             }
             //Else if any service has an oauth format - use and store
-            else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+            else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
             {
-                IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                 if (hostWithOAuthDomain.Count() > 0)
                 {
-                    if (DoWeAdd(line, UI, sender))
+                    if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                    {
+                        IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                        if (DoWeAdd(line, UI, sender))
+                        {
+                            preparedUsernames.Add(line + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain);
+                        }
+                    }
+                    else if (DoWeAdd(line, UI, sender))
                     {
                         preparedUsernames.Add(line + "@" + hostWithOAuthDomain.First().OAuthDomain);
                     }
@@ -181,12 +189,20 @@ namespace sLYNCy_WPF
                 oAuthHost = hostWithOAuthDomain.First();
             }
             //Else if any host has NTLM - use and store
-            else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null) && onlyModern == false)
+            else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != "") && onlyModern == false)
             {
-                IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                 if (hostWithNTLMDomain.Count() > 0)
                 {
-                    if (DoWeAdd(line, UI, sender))
+                    if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
+                    {
+                        IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                        if (DoWeAdd(line, UI, sender))
+                        {
+                            preparedUsernames.Add(hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + line);
+                        }
+                    }
+                    else if (DoWeAdd(line, UI, sender))
                     {
                         preparedUsernames.Add(hostWithNTLMDomain.First().NTLMDomain + "\\" + line);
                     }
@@ -204,14 +220,14 @@ namespace sLYNCy_WPF
             //UPDATED - this is for services that REQUIRE legacy - so ONLY add legacy - or not at all
 
             //Add Legacy format FROM THIS SERVICE first if we can
-            if (host.NTLMDomain != null)
+            if (host.NTLMDomain != null && host.NTLMDomain != "")
             {
                 if (DoWeAdd(line, UI, sender))
                 {
                     preparedUsernames.Add(host.NTLMDomain + "\\" + line);
                 }
             }
-            else if (host.OAuthDomain != null && onlyLegacy == false)
+            else if (host.OAuthDomain != null && host.OAuthDomain != "" && onlyLegacy == false)
             {
                 //Then Modern style FROM THIS SERVIC Eif we have it
                 if (DoWeAdd(line, UI, sender))
@@ -235,26 +251,42 @@ namespace sLYNCy_WPF
                     preparedUsernames.Add(line + "@" + oAuthHost.OAuthDomain);
                 }
             }
-            else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+            else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
             {
                 //IF ANY HOST HAS NTLM DOMAIN USE THAT and store
-                IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                 if (hostWithNTLMDomain.Count() > 0)
                 {
-                    if (DoWeAdd(line, UI, sender))
+                    if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
+                    {
+                        IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                        if (DoWeAdd(line, UI, sender))
+                        {
+                            preparedUsernames.Add(hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + line);
+                        }
+                    }
+                    else if (DoWeAdd(line, UI, sender))
                     {
                         preparedUsernames.Add(hostWithNTLMDomain.First().NTLMDomain + "\\" + line);
                     }
                 }
                 ntlmHost = hostWithNTLMDomain.First();
             }
-            else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null) && onlyLegacy == false)
+            else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != "") && onlyLegacy == false)
             {
                 //IF ANY HOST HAS OAUTH DOMAIN USE THAT and store
-                IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                 if (hostWithOAuthDomain.Count() > 0)
                 {
-                    if (DoWeAdd(line, UI, sender))
+                    if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                    {
+                        IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                        if (DoWeAdd(line, UI, sender))
+                        {
+                            preparedUsernames.Add(line + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain);
+                        }
+                    }
+                    else if (DoWeAdd(line, UI, sender))
                     {
                         preparedUsernames.Add(line + "@" + hostWithOAuthDomain.First().OAuthDomain);
                     }
@@ -314,7 +346,7 @@ namespace sLYNCy_WPF
             {
                 if (host.Service == MicrosoftService.Skype || host.Service == MicrosoftService.Exchange || host.Service == MicrosoftService.ADFS || host.Service == MicrosoftService.RDWeb)
                 {
-                    if (host.NTLMDomain != null)
+                    if (host.NTLMDomain != null && host.NTLMDomain != "")
                     {
                         //NOW GO LEGACY FORMAT
                         if (DoWeAdd(username, UI, sender))
@@ -326,7 +358,7 @@ namespace sLYNCy_WPF
                             return null;
                         }
                     }
-                    else if (host.OAuthDomain != null)
+                    else if (host.OAuthDomain != null && host.OAuthDomain != "")
                     {
                         if (DoWeAdd(username, UI, sender))
                         {
@@ -337,13 +369,21 @@ namespace sLYNCy_WPF
                             return null;
                         }
                     }
-                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
                     {
                         //IF ANY HOST HAS NTLM DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                         if (hostWithNTLMDomain.Count() > 0)
                         {
-                            if (DoWeAdd(username, UI, sender))
+                            if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + username;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
                             {
 
                                 return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
@@ -354,13 +394,21 @@ namespace sLYNCy_WPF
                             }
                         }
                     }
-                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
                     {
                         //IF ANY HOST HAS OAUTH DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                         if (hostWithOAuthDomain.Count() > 0)
                         {
-                            if (DoWeAdd(username, UI, sender))
+                            if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return username + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
                             {
                                 return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
                             }
@@ -379,7 +427,7 @@ namespace sLYNCy_WPF
                 else
                 {
                     //FOR OTHERS - CAN FIGURE WHICH IS WHICH LATER - DO OAUTH FORMAT THEN LEGACY
-                    if (host.OAuthDomain != null)
+                    if (host.OAuthDomain != null && host.OAuthDomain != "")
                     {
                         //ALWAYS DEFAULT TO OAUTH IF POSSIBLE - MORE LIKELY TO CONTAIN EMAIL STYLE FORMAT
                         if (DoWeAdd(username, UI, sender))
@@ -392,7 +440,7 @@ namespace sLYNCy_WPF
                         }
 
                     }
-                    else if (host.NTLMDomain != null)
+                    else if (host.NTLMDomain != null && host.NTLMDomain != "")
                     {
                         //NOW GO LEGACY FORMAT IF WE HAVE TO
                         if (DoWeAdd(username, UI, sender))
@@ -404,35 +452,52 @@ namespace sLYNCy_WPF
                             return null;
                         }
                     }
-                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
                     {
                         //IF ANY HOST HAS OAUTH DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                         if (hostWithOAuthDomain.Count() > 0)
                         {
-                            if (DoWeAdd(username, UI, sender))
+                            if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return username + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
                             {
                                 return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
                             }
                             else
                             {
-                                return null;
+                                return "";
                             }
                         }
                     }
-                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
                     {
                         //IF ANY HOST HAS NTLM DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                         if (hostWithNTLMDomain.Count() > 0)
                         {
-                            if (DoWeAdd(username, UI, sender))
+                            if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
                             {
+                                IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + username;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
+                            {
+
                                 return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
                             }
                             else
                             {
-                                return null;
+                                return "";
                             }
                         }
                     }
@@ -446,7 +511,7 @@ namespace sLYNCy_WPF
             else if (sender == SendingWindow.PasswordSpray)
             {
                 //Do OAuth then Legacy ALWAYS
-                if (host.OAuthDomain != null)
+                if (host.OAuthDomain != null && host.OAuthDomain != "")
                 {
                     //ALWAYS DEFAULT TO OAUTH IF POSSIBLE - MORE LIKELY TO CONTAIN EMAIL STYLE FORMAT
                     if (DoWeAdd(username, UI, sender))
@@ -459,7 +524,7 @@ namespace sLYNCy_WPF
                     }
 
                 }
-                else if (host.NTLMDomain != null)
+                else if (host.NTLMDomain != null && host.NTLMDomain != "")
                 {
                     //NOW GO LEGACY FORMAT IF WE HAVE TO
                     if (DoWeAdd(username, UI, sender))
@@ -471,35 +536,54 @@ namespace sLYNCy_WPF
                         return null;
                     }
                 }
-                else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+                else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
                 {
                     //IF ANY HOST HAS OAUTH DOMAIN USE THAT
-                    IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                    IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                     if (hostWithOAuthDomain.Count() > 0)
                     {
-                        if (DoWeAdd(username, UI, sender))
+
+                        if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                        {
+                            IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                            if (DoWeAdd(username, UI, sender))
+                            {
+                                return username + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain;
+                            }
+                        }
+                        else if (DoWeAdd(username, UI, sender))
                         {
                             return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
                         }
                         else
                         {
-                            return null;
+                            return "";
                         }
+
                     }
                 }
-                else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+                else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
                 {
                     //IF ANY HOST HAS NTLM DOMAIN USE THAT
-                    IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                    IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                     if (hostWithNTLMDomain.Count() > 0)
                     {
-                        if (DoWeAdd(username, UI, sender))
+                        if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
                         {
+                            IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                            if (DoWeAdd(username, UI, sender))
+                            {
+                                return hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + username;
+                            }
+                        }
+                        else if (DoWeAdd(username, UI, sender))
+                        {
+
                             return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
                         }
                         else
                         {
-                            return null;
+                            return "";
                         }
                     }
                 }
@@ -535,33 +619,63 @@ namespace sLYNCy_WPF
                 if (host.Service == MicrosoftService.Skype || host.Service == MicrosoftService.Exchange || host.Service == MicrosoftService.ADFS || host.Service == MicrosoftService.RDWeb)
                 {
                     //IF WE ARE DOING USER ENUM FOR SKYPE - MUST BE LEGACY FORMAT - SO ADD LEGACY FIRST (/probs should be only)
-                    if (host.NTLMDomain != null)
+                    if (host.NTLMDomain != null && host.NTLMDomain != "")
                     {
                         return host.NTLMDomain + "\\" + username;
                     }
-                    else if (host.OAuthDomain != null)
+                    else if (host.OAuthDomain != null && host.OAuthDomain != "")
                     {
                         return username + "@" + host.OAuthDomain;
                     }
-                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
                     {
                         //IF ANY HOST HAS NTLM DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                         if (hostWithNTLMDomain.Count() > 0)
                         {
 
-                            return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
+                            if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + username;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
+                            {
+
+                                return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
+                            }
+                            else
+                            {
+                                return "";
+                            }
 
                         }
                     }
-                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
                     {
                         //IF ANY HOST HAS OAUTH DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                         if (hostWithOAuthDomain.Count() > 0)
                         {
-
-                            return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
+                            if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return username + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
+                            {
+                                return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
+                            }
+                            else
+                            {
+                                return "";
+                            }
 
                         }
                     }
@@ -574,38 +688,69 @@ namespace sLYNCy_WPF
                 else
                 {
                     //FOR OTHERS - CAN FIGURE WHICH IS WHICH LATER - DO OAUTH FORMAT THEN LEGACY
-                    if (host.OAuthDomain != null)
+                    if (host.OAuthDomain != null && host.OAuthDomain != "")
                     {
 
                         return username + "@" + host.OAuthDomain;
 
 
                     }
-                    else if (host.NTLMDomain != null)
+                    else if (host.NTLMDomain != null && host.NTLMDomain != "")
                     {
 
                         return host.NTLMDomain + "\\" + username;
 
                     }
-                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+                    else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
                     {
                         //IF ANY HOST HAS OAUTH DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                        IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                         if (hostWithOAuthDomain.Count() > 0)
                         {
 
-                            return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
+                            if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return username + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
+                            {
+                                return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
+                            }
+                            else
+                            {
+                                return "";
+                            }
 
                         }
                     }
-                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+                    else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
                     {
                         //IF ANY HOST HAS NTLM DOMAIN USE THAT
-                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                        IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                         if (hostWithNTLMDomain.Count() > 0)
                         {
 
-                            return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
+                            if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
+                            {
+                                IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                                if (DoWeAdd(username, UI, sender))
+                                {
+                                    return hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + username;
+                                }
+                            }
+                            else if (DoWeAdd(username, UI, sender))
+                            {
+
+                                return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
+                            }
+                            else
+                            {
+                                return "";
+                            }
 
                         }
                     }
@@ -619,39 +764,70 @@ namespace sLYNCy_WPF
             else if (sender == SendingWindow.PasswordSpray)
             {
                 //Do OAuth then Legacy ALWAYS
-                if (host.OAuthDomain != null)
+                if (host.OAuthDomain != null && host.OAuthDomain != "")
                 {
 
                     return username + "@" + host.OAuthDomain;
 
 
                 }
-                else if (host.NTLMDomain != null)
+                else if (host.NTLMDomain != null && host.NTLMDomain != "")
                 {
                     //NOW GO LEGACY FORMAT IF WE HAVE TO
 
                     return host.NTLMDomain + "\\" + username;
 
                 }
-                else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null))
+                else if (UI.enumeratedHostnames.Any(q => q.OAuthDomain != null && q.OAuthDomain != ""))
                 {
                     //IF ANY HOST HAS OAUTH DOMAIN USE THAT
-                    IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null);
+                    IEnumerable<Hostnames> hostWithOAuthDomain = UI.enumeratedHostnames.Where(x => x.OAuthDomain != null && x.OAuthDomain != "");
                     if (hostWithOAuthDomain.Count() > 0)
                     {
 
-                        return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
+                        if (hostWithOAuthDomain.Any(p => p.O365 != "Y"))
+                        {
+                            IEnumerable<Hostnames> hostWithOAuthDomainNotO365 = hostWithOAuthDomain.Where(x => x.O365 != "Y");
+                            if (DoWeAdd(username, UI, sender))
+                            {
+                                return username + "@" + hostWithOAuthDomainNotO365.First().OAuthDomain;
+                            }
+                        }
+                        else if (DoWeAdd(username, UI, sender))
+                        {
+                            return username + "@" + hostWithOAuthDomain.First().OAuthDomain;
+                        }
+                        else
+                        {
+                            return "";
+                        }
 
                     }
                 }
-                else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null))
+                else if (UI.enumeratedHostnames.Any(p => p.NTLMDomain != null && p.NTLMDomain != ""))
                 {
                     //IF ANY HOST HAS NTLM DOMAIN USE THAT
-                    IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null);
+                    IEnumerable<Hostnames> hostWithNTLMDomain = UI.enumeratedHostnames.Where(x => x.NTLMDomain != null && x.NTLMDomain != "");
                     if (hostWithNTLMDomain.Count() > 0)
                     {
 
-                        return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
+                        if (hostWithNTLMDomain.Any(p => p.O365 != "Y"))
+                        {
+                            IEnumerable<Hostnames> hostWithNTLMDomainNotO365 = hostWithNTLMDomain.Where(x => x.O365 != "Y");
+                            if (DoWeAdd(username, UI, sender))
+                            {
+                                return hostWithNTLMDomainNotO365.First().NTLMDomain + "\\" + username;
+                            }
+                        }
+                        else if (DoWeAdd(username, UI, sender))
+                        {
+
+                            return hostWithNTLMDomain.First().NTLMDomain + "\\" + username;
+                        }
+                        else
+                        {
+                            return "";
+                        }
 
                     }
                 }

@@ -1,6 +1,7 @@
 ﻿adfs
 sts
 fs
+sso
 portal
 federation
 wap
