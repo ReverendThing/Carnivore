@@ -20,3 +20,5 @@ mailserver
 mailhost
 mailer
 mailadmin
+imap
+pop3

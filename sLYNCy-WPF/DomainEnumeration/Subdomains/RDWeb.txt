@@ -17,3 +17,5 @@ remote3
 remote4
 remote01
 remote02
+vdi
+rdgate

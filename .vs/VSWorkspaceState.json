@@ -1,6 +1,16 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\packages",
+    "\\sLYNCy-WPF",
+    "\\sLYNCy-WPF\\bin",
+    "\\sLYNCy-WPF\\DomainEnumeration",
+    "\\sLYNCy-WPF\\Helper",
+    "\\sLYNCy-WPF\\Helper\\Usernames",
+    "\\sLYNCy-WPF\\obj",
+    "\\sLYNCy-WPF\\Properties",
+    "\\sLYNCy-WPF\\UsernameEnumeration"
   ],
+  "SelectedNode": "\\packages",
   "PreviewInSolutionExplorer": false
 }

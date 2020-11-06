@@ -821,6 +821,7 @@ namespace sLYNCy_WPF
                 case MicrosoftService.Exchange:
                     userEnumRequest.postData = string.Format("destination={0}&flags=4&forcedownlevel=0&username={1}&password={2}&isUtf8=1&trusted=0", host.EnumURL.Url.Replace("auth.owa", ""), username, Uri.EscapeDataString(password));
                     userEnumRequest.request.ContentType = "application/x-www-form-urlencoded";
+                    userEnumRequest.request.Headers.Add("Cookie: PBack=0");
                     userEnumRequest.request.AllowAutoRedirect = false;
                     UI.ThreadSafeAppendLog("[3]Exchange Post Data: " + userEnumRequest.postData);
                     UI.ThreadSafeAppendLog("[3]Exchange URL: " + userEnumRequest.url);

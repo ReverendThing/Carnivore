@@ -449,7 +449,7 @@ namespace sLYNCy_WPF
                         }
                         else
                         {
-                            if (host.EnumURL == null && host.SprayURL == null)
+                            if (host.EnumURL.Url == "" && host.SprayURL.Url == "")
                             {
                                 //Not sure we could hit here with Y - but just to check
                                 if (host.O365 != "Y")
@@ -474,7 +474,7 @@ namespace sLYNCy_WPF
                     }
                     else
                     {
-                        if (host.EnumURL == null && host.SprayURL == null)
+                        if (host.EnumURL.Url == "" && host.SprayURL.Url == "")
                         {
                             //Not sure we could hit here with Y - but just to check
                             if (host.O365 != "Y")
